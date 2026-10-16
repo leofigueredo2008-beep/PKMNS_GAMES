@@ -258,3 +258,12 @@ body.light-theme .data-sheet {
 a.side-btn {
   text-decoration: none;
 }
+
+/* Move o indicador de zoom para o canto inferior esquerdo */
+.globe-overlay {
+  top: auto !important;
+  bottom: 18px !important;
+  left: 18px !important;
+  right: auto !important;
+  z-index: 6;
+}
