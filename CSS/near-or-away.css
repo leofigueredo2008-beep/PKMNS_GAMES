@@ -46,11 +46,52 @@
 
 
 /* Histórico de dicas por Pokémon */
+
+/* Ícone de dicas no histórico */
 .na-hint-history {
-  display: inline-block;
-  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 5px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
   cursor: help;
+  vertical-align: middle;
+  opacity: 0.85;
 }
+
+.na-hint-history:hover,
+.na-hint-history:focus {
+  opacity: 1;
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+/* Balão flutuante: fora da lista e acima da interface */
+.na-floating-hint {
+  display: none;
+  position: fixed;
+  z-index: 2147483647;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 24px));
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel, #20242c);
+  color: var(--text, #fff);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  box-shadow: 0 5px 18px #0006;
+  pointer-events: auto;
+}
+
 
 .na-hint-history .na-hint-tooltip {
   display: none;
@@ -71,10 +112,13 @@
   pointer-events: none;
 }
 
+
 .na-hint-history:hover .na-hint-tooltip,
-.na-hint-history:focus-within .na-hint-tooltip {
+.na-hint-history:focus-within .na-hint-tooltip,
+.na-list li:hover .na-hint-tooltip {
   display: block;
 }
+
 
 .na-hint-tooltip p {
   margin: 4px 0;

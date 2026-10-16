@@ -30,7 +30,23 @@ function render() {
   const last = guesses[guesses.length - 1];
   $n("why").textContent = last && !solved ? `${last.p.displayName}: ${last.why.length ? last.why.join(" • ") : "nothing in common"}` : "";
   const sorted = guesses.slice().sort((a, b) => a.rank - b.rank);
-  $n("list").innerHTML = sorted.map(g => `<li class="z-${zoneOf(g.rank)}${g === last ? " latest" : ""}">${sprite(g.p)}<span class="nm">${escapeHTML(g.p.displayName)}</span><span class="rk">#${g.rank}</span><span class="bar"><b style="width:${Math.max(3, 100 * (1 - Math.log(g.rank) / Math.log(dex.length)))}%"></b></span></li>`).join("");
+  
+  hideFloatingHint();
+
+  $n("list").innerHTML = sorted.map(g => `
+    <li class="z-${zoneOf(g.rank)}${g === last ? " latest" : ""}">
+      ${sprite(g.p)}
+      <span class="nm">
+        ${escapeHTML(g.p.displayName)}
+        ${createHintHistoryHTML(g.why)}
+      </span>
+      <span class="rk">#${g.rank}</span>
+       <span class="bar">
+       <b style="width:${Math.max(3, 100 * (1 - Math.log(g.rank) / Math.log(dex.length)))}%"></b>
+      </span>
+    </li>
+  `).join("");
+
 }
 
 function closestName(v) {
@@ -69,13 +85,10 @@ async function startNear() {
 }
 
 
-function createHintHistoryHTML(hints) {
-  if (!Array.isArray(hints) || hints.length === 0) {
-    return "";
-  }
 
-  const escapeHTML = (value) =>
-    String(value).replace(/[&<>"']/g, (char) => ({
+function createHintHistoryHTML(hints) {
+  const escapeAttr = value =>
+    String(value).replace(/[&<>"']/g, char => ({
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
@@ -83,18 +96,145 @@ function createHintHistoryHTML(hints) {
       "'": "&#39;"
     })[char]);
 
+  const messages = hints && hints.length
+    ? hints
+    : ["nothing in common"];
+
   return `
-    <span class="na-hint-history" tabindex="0"
-          aria-label="View previous hints">
-      <span aria-hidden="true">ⓘ</span>
-      <span class="na-hint-tooltip" role="tooltip">
-        ${hints.map(hint =>
-          `<p>${escapeHTML(hint)}</p>`
-        ).join("")}
-      </span>
+    <span class="na-hint-history"
+          tabindex="0"
+          role="button"
+          aria-label="View hints"
+          data-hints="${escapeAttr(messages.join(" • "))}">
+      ⓘ
     </span>
   `;
 }
+
+
+let activeHintTrigger = null;
+let floatingHint = null;
+
+function getFloatingHint() {
+  if (!floatingHint) {
+    floatingHint = document.createElement("div");
+    floatingHint.className = "na-floating-hint";
+    floatingHint.setAttribute("role", "tooltip");
+    document.body.appendChild(floatingHint);
+
+    floatingHint.addEventListener("pointerleave", event => {
+      if (activeHintTrigger &&
+          activeHintTrigger.closest("li")?.contains(event.relatedTarget)) {
+        return;
+      }
+
+      hideFloatingHint();
+    });
+  }
+
+  return floatingHint;
+}
+
+function positionFloatingHint(trigger) {
+  const tip = getFloatingHint();
+  const row = trigger.closest("li");
+  if (!row) return;
+
+  const rect = row.getBoundingClientRect();
+
+  tip.style.display = "block";
+
+  const tipRect = tip.getBoundingClientRect();
+  const margin = 12;
+
+  let left = Math.max(
+    margin,
+    Math.min(rect.left, window.innerWidth - tipRect.width - margin)
+  );
+
+  let top = rect.top - tipRect.height;
+
+  if (top < margin) {
+    top = Math.min(
+      rect.bottom,
+      window.innerHeight - tipRect.height - margin
+    );
+  }
+
+  tip.style.left = `${left}px`;
+  tip.style.top = `${Math.max(margin, top)}px`;
+}
+
+function showFloatingHint(trigger) {
+  if (!trigger) return;
+
+  activeHintTrigger = trigger;
+
+  const tip = getFloatingHint();
+  tip.textContent = (trigger.dataset.hints || "nothing in common")
+    .replace(/ • /g, "\n");
+
+  positionFloatingHint(trigger);
+}
+
+function hideFloatingHint() {
+  if (floatingHint) {
+    floatingHint.style.display = "none";
+  }
+
+  activeHintTrigger = null;
+}
+
+const hintList = $n("list");
+
+hintList.addEventListener("pointerover", event => {
+  const row = event.target.closest("li");
+  if (!row || !hintList.contains(row)) return;
+
+  const trigger = row.querySelector(".na-hint-history");
+  if (trigger && trigger !== activeHintTrigger) {
+    showFloatingHint(trigger);
+  }
+});
+
+hintList.addEventListener("pointerout", event => {
+  const row = event.target.closest("li");
+
+  if (!row || !activeHintTrigger ||
+      !row.contains(activeHintTrigger)) return;
+
+  if (event.relatedTarget &&
+      (row.contains(event.relatedTarget) ||
+       floatingHint?.contains(event.relatedTarget))) {
+    return;
+  }
+
+  hideFloatingHint();
+});
+
+hintList.addEventListener("focusin", event => {
+  const trigger = event.target.closest(".na-hint-history");
+  if (trigger) showFloatingHint(trigger);
+});
+
+hintList.addEventListener("focusout", event => {
+  if (!event.relatedTarget ||
+      !event.relatedTarget.classList?.contains("na-hint-history")) {
+    hideFloatingHint();
+  }
+});
+
+window.addEventListener("scroll", () => {
+  if (activeHintTrigger) {
+    positionFloatingHint(activeHintTrigger);
+  }
+}, true);
+
+window.addEventListener("resize", () => {
+  if (activeHintTrigger) {
+    positionFloatingHint(activeHintTrigger);
+  }
+});
 
 
 
