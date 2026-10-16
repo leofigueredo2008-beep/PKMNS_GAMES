@@ -1,0 +1,9 @@
+.catalog { max-width: 880px; margin: 6vh auto 0; text-align: center; }
+.logo { margin: 0; color: var(--yellow); font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 950; letter-spacing: -2px; text-shadow: 3px 3px 0 var(--blue); }
+.subtitle { color: var(--muted); margin: 8px 0 32px; }
+.catalog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
+.game-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 260px; padding: 28px 22px; border-radius: 22px; border: 1px solid var(--line); background: var(--panel); color: var(--text); text-decoration: none; transition: transform .15s, border-color .15s, box-shadow .15s; }
+.game-tile:hover, .game-tile:focus-visible { transform: translateY(-4px); border-color: var(--yellow); box-shadow: 0 18px 44px rgba(0, 0, 0, .28); }
+.game-tile h2 { margin: 0; font-size: 1.5rem; }
+.game-tile p { margin: 0; color: var(--muted); font-size: .92rem; line-height: 1.4; }
+.tile-icon { font-size: 3.6rem; line-height: 1; }

@@ -1,0 +1,324 @@
+/* Full-screen layout overrides: floating buttons, input bar, settings panel */
+
+body {
+  padding: 0;
+}
+
+.app {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+header {
+  display: none;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: hidden;
+}
+
+body.light-theme .card {
+  background: transparent;
+  box-shadow: none;
+}
+
+.topbar, .progress, .hint, .encountered-header {
+  display: none !important;
+}
+
+.game-layout {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.view-pane {
+  width: 100%;
+  height: 100%;
+}
+
+#hardGrid, #regionGrid {
+  display: none !important;
+}
+
+.globe-wrap {
+  position: absolute;
+  inset: 0;
+  display: none !important;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.globe-wrap.active {
+  display: block !important;
+}
+
+#globeCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.globe-overlay {
+  top: 78px;
+  left: 18px;
+  right: 18px;
+  z-index: 5;
+}
+
+.globe-legend {
+  bottom: 18px;
+  z-index: 5;
+}
+
+.input-row {
+  position: absolute;
+  z-index: 12;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  width: min(620px, calc(100% - 260px));
+  margin: 0;
+  display: block;
+}
+
+.message {
+  position: absolute;
+  z-index: 13;
+  left: 50%;
+  bottom: 82px;
+  transform: translateX(-50%);
+  width: min(620px, calc(100% - 260px));
+  margin: 0;
+  padding: 4px 10px;
+  text-align: center;
+  font-size: .78rem;
+  font-weight: 900;
+  pointer-events: none;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .55);
+  min-height: 0;
+}
+
+.message.bad {
+  color: #ff5b6e;
+}
+
+.message.good {
+  color: var(--green);
+}
+
+.game-input {
+  width: 100%;
+  height: 52px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  background: rgba(20, 26, 40, .28);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background .2s, border-color .2s, box-shadow .2s;
+}
+
+.game-input::placeholder {
+  color: rgba(235, 240, 250, .66);
+}
+
+.game-input:focus {
+  background: rgba(20, 26, 40, .40);
+  border-color: rgba(255, 203, 5, .64);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, .24), 0 0 0 3px rgba(255, 203, 5, .08);
+}
+
+body.light-theme .game-input {
+  background: rgba(255, 250, 243, .55);
+  border-color: rgba(90, 70, 40, .22);
+  color: var(--text);
+  box-shadow: 0 8px 28px rgba(120, 90, 50, .14);
+}
+
+body.light-theme .game-input::placeholder {
+  color: rgba(80, 70, 55, .55);
+}
+
+body.light-theme .game-input:focus {
+  background: rgba(255, 250, 243, .75);
+}
+
+.side-actions {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.side-left {
+  left: 16px;
+  top: 16px;
+}
+
+.side-right {
+  right: 16px;
+  top: 16px;
+}
+
+.side-btn {
+  min-width: 54px;
+  min-height: 46px;
+  padding: 9px 11px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  box-shadow: 0 7px 20px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(20, 26, 40, .58);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.side-btn span {
+  font-size: .66rem;
+  letter-spacing: .35px;
+}
+
+.side-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.side-btn.give-up {
+  background: rgba(251, 113, 133, .76);
+  color: #fff;
+}
+
+.side-btn.settings-btn {
+  background: rgba(20, 26, 40, .58);
+  color: var(--text);
+  min-width: 122px;
+}
+
+body.light-theme .side-btn {
+  background: rgba(255, 250, 243, .80);
+  color: var(--text);
+  border-color: rgba(90, 70, 40, .20);
+}
+
+body.light-theme .side-btn.give-up {
+  background: rgba(210, 98, 107, .88);
+  color: #fff;
+}
+
+.settings-panel {
+  position: fixed;
+  z-index: 29;
+  left: 16px;
+  top: 70px;
+  width: min(500px, calc(100vw - 32px));
+  min-height: 250px;
+  margin: 0;
+  padding: 18px;
+  background: rgba(20, 26, 40, .90);
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 18px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .34);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.settings-panel.open {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.settings-panel .settings-section {
+  min-width: 0;
+}
+
+.settings-panel .settings-filters {
+  grid-column: 1 / -1;
+}
+
+body.light-theme .settings-panel {
+  background: rgba(255, 250, 243, .95);
+  border-color: rgba(90, 70, 40, .20);
+}
+
+.filter-inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.filter-inline .filter-group {
+  gap: 5px;
+}
+
+.filter-inline .filter-label {
+  font-size: .62rem;
+}
+
+.filter-inline .filter-select {
+  padding: 9px 10px;
+  font-size: .76rem;
+}
+
+
+/* Layout fixes: keep the typing bar clear of controls and prevent HUD overlap. */
+.input-row { z-index: 20; top: 30px; bottom: auto; width: min(930px, calc(100% - 320px)); }
+.message { top: 86px; bottom: auto; z-index: 21; }
+.side-left, .side-right { top: 16px; z-index: 40; }
+.side-left { left: 16px; }
+.side-right { right: 16px; }
+.settings-panel { z-index: 39; top: 78px; max-height: calc(100vh - 100px); overflow-y: auto; }
+.globe-overlay { top: 132px; }
+.globe-legend { bottom: 18px; max-width: calc(100vw - 32px); }
+@media (max-width: 760px) {
+  .input-row { top: 92px; width: calc(100% - 32px); }
+  .message { top: 146px; width: calc(100% - 32px); }
+  .globe-overlay { top: 154px; }
+  .settings-panel { top: 72px; width: min(420px, calc(100vw - 32px)); }
+}
+
+
+/* Safe overrides: keep the input in its original bottom position and remove only requested hints. */
+.globe-pill:not(#globeZoom),
+.globe-legend {
+  display: none !important;
+}
+.input-row {
+  top: auto !important;
+  bottom: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+.message {
+  top: auto !important;
+  bottom: 82px !important;
+}
