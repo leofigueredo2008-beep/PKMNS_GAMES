@@ -1,32 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Pokémon Encounter Quiz</title>
-  <link rel="stylesheet" href="css/01-variables-themes.css">
-  <link rel="stylesheet" href="css/02-layout.css">
-  <link rel="stylesheet" href="css/03-settings-hints.css">
-  <link rel="stylesheet" href="css/04-congrats.css">
-  <link rel="stylesheet" href="css/05-filters-regions.css">
-  <link rel="stylesheet" href="css/06-data-sheet.css">
-  <link rel="stylesheet" href="css/07-globe.css">
-  <link rel="stylesheet" href="css/08-fullscreen-layout.css">
-  <link rel="stylesheet" href="css/09-hud-responsive.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/01-variables-themes.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/02-layout.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/03-settings-hints.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/04-congrats.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/05-filters-regions.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/06-data-sheet.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/07-globe.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/08-fullscreen-layout.css">
+  <link rel="stylesheet" href="../CSS/Global-Quiz/09-hud-responsive.css">
 </head>
-
 <body>
   <div class="app">
     <header>
       <h1 class="logo">POKÉMON ENCOUNTER</h1>
       <p class="subtitle">Type every Pokémon you can remember. No time limit — just chase your record.</p>
     </header>
-
     <main class="card">
       <div class="side-actions side-left">
         <button id="settingsBtn" class="side-btn settings-btn" type="button">⚙<span>SETTINGS</span></button>
-        <a href="index.html" class="side-btn secondary" aria-label="Back to catalog">⌂<span>CATALOG</span></a>
+        <a href="../index.html" class="side-btn secondary" aria-label="Back to catalog">⌂<span>CATALOG</span></a>
       </div>
       <div class="side-actions side-right">
         <button id="newGameBtn" class="side-btn secondary" type="button">↻<span>NEW GAME</span></button>
@@ -82,131 +79,64 @@
             <div class="filter-group">
               <label class="filter-label" for="generationFilter">Generation</label>
               <select id="generationFilter" class="filter-select">
-                <option value="all">All Generations</option>
-                <option value="1">Generation I</option>
-                <option value="2">Generation II</option>
-                <option value="3">Generation III</option>
-                <option value="4">Generation IV</option>
-                <option value="5">Generation V</option>
-                <option value="6">Generation VI</option>
-                <option value="7">Generation VII</option>
-                <option value="8">Generation VIII</option>
-                <option value="9">Generation IX</option>
+                <option value="all">All Generations</option><option value="1">Generation I</option><option value="2">Generation II</option><option value="3">Generation III</option><option value="4">Generation IV</option><option value="5">Generation V</option><option value="6">Generation VI</option><option value="7">Generation VII</option><option value="8">Generation VIII</option><option value="9">Generation IX</option>
               </select>
             </div>
             <div class="filter-group">
               <label class="filter-label" for="typeFilter">Type</label>
               <select id="typeFilter" class="filter-select">
-                <option value="all">All Types</option>
-                <option value="normal">Normal</option>
-                <option value="fire">Fire</option>
-                <option value="water">Water</option>
-                <option value="electric">Electric</option>
-                <option value="grass">Grass</option>
-                <option value="ice">Ice</option>
-                <option value="fighting">Fighting</option>
-                <option value="poison">Poison</option>
-                <option value="ground">Ground</option>
-                <option value="flying">Flying</option>
-                <option value="psychic">Psychic</option>
-                <option value="bug">Bug</option>
-                <option value="rock">Rock</option>
-                <option value="ghost">Ghost</option>
-                <option value="dragon">Dragon</option>
-                <option value="dark">Dark</option>
-                <option value="steel">Steel</option>
-                <option value="fairy">Fairy</option>
+                <option value="all">All Types</option><option value="normal">Normal</option><option value="fire">Fire</option><option value="water">Water</option><option value="electric">Electric</option><option value="grass">Grass</option><option value="ice">Ice</option><option value="fighting">Fighting</option><option value="poison">Poison</option><option value="ground">Ground</option><option value="flying">Flying</option><option value="psychic">Psychic</option><option value="bug">Bug</option><option value="rock">Rock</option><option value="ghost">Ghost</option><option value="dragon">Dragon</option><option value="dark">Dark</option><option value="steel">Steel</option><option value="fairy">Fairy</option>
               </select>
             </div>
           </div>
         </section>
       </div>
-
       <div class="topbar">
-        <div class="stat">
-          <div id="score" class="stat-value">0 / 1025</div>
-          <div class="stat-label">Encountered</div>
-        </div>
-        <div class="stat">
-          <div id="timer" class="stat-value timer">00:00</div>
-          <div class="stat-label">Time</div>
-        </div>
-        <div class="stat">
-          <div id="dexLabel" class="stat-value">Normal</div>
-          <div class="stat-label">Pokédex</div>
-        </div>
+        <div class="stat"><div id="score" class="stat-value">0 / 1025</div><div class="stat-label">Encountered</div></div>
+        <div class="stat"><div id="timer" class="stat-value timer">00:00</div><div class="stat-label">Time</div></div>
+        <div class="stat"><div id="dexLabel" class="stat-value">Normal</div><div class="stat-label">Pokédex</div></div>
       </div>
-
-      <div class="progress">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
-
-      <div class="input-row">
-        <input id="pokemonInput" class="game-input" type="text" autocomplete="off" spellcheck="false" placeholder="Type a Pokémon name and press Enter">
-      </div>
-
+      <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+      <div class="input-row"><input id="pokemonInput" class="game-input" type="text" autocomplete="off" spellcheck="false" placeholder="Type a Pokémon name and press Enter"></div>
       <div id="message" class="message"></div>
       <div id="hintToast" class="hint-toast" role="status" aria-live="polite"></div>
       <p class="hint">Correct answers are registered instantly. In Normal mode, Pokémon stay completely hidden until you encounter them.</p>
-
-      <div class="encountered-header">
-        <h2 id="encounteredTitle">Regional Pokédex</h2>
-        <span id="lastFound" class="hint"></span>
-      </div>
+      <div class="encountered-header"><h2 id="encounteredTitle">Regional Pokédex</h2><span id="lastFound" class="hint"></span></div>
       <div id="gameLayout" class="game-layout">
         <div id="viewPane" class="view-pane">
           <div id="hardGrid" class="grid hidden"></div>
           <div id="regionGrid" class="regions"></div>
           <div id="globeWrap" class="globe-wrap">
             <canvas id="globeCanvas" aria-label="Interactive 3D Pokémon globe"></canvas>
-            <div class="globe-overlay">
-              <div id="globeZoom" class="globe-pill">Zoom 100%</div>
-            </div>
+            <div class="globe-overlay"><div id="globeZoom" class="globe-pill">Zoom 100%</div></div>
             <div id="genLegend" class="gen-legend" aria-label="Generation colors"></div>
           </div>
         </div>
         <aside id="dataSheet" class="data-sheet" aria-live="polite" aria-hidden="true"></aside>
       </div>
-
     </main>
   </div>
-
   <div id="congrats" class="congrats hidden" role="dialog" aria-modal="true" aria-labelledby="congratsTitle">
     <div class="congrats-card">
-      <div class="congrats-emoji">🏆</div>
-      <h2 id="congratsTitle">Congratulations!</h2>
-      <p id="congratsText"></p>
-      <div class="congrats-actions">
-        <button id="congratsAgain" class="side-btn primary" type="button">PLAY AGAIN</button>
-        <button id="congratsClose" class="side-btn" type="button">KEEP EXPLORING</button>
-      </div>
+      <div class="congrats-emoji">🏆</div><h2 id="congratsTitle">Congratulations!</h2><p id="congratsText"></p>
+      <div class="congrats-actions"><button id="congratsAgain" class="side-btn primary" type="button">PLAY AGAIN</button><button id="congratsClose" class="side-btn" type="button">KEEP EXPLORING</button></div>
     </div>
   </div>
   <div id="loading" class="loading">
-    <div class="loading-box">
-      <div class="spinner"></div>
-      <h2 id="loadingTitle">Preparing your Pokédex...</h2>
-      <p id="loadingText">Loading Pokémon data and sprites.</p>
-      <div class="loading-progress">
-        <div id="loadingBar"></div>
-      </div>
-      <p id="loadingPercent" class="small">0%</p>
-    </div>
+    <div class="loading-box"><div class="spinner"></div><h2 id="loadingTitle">Preparing your Pokédex...</h2><p id="loadingText">Loading Pokémon data and sprites.</p><div class="loading-progress"><div id="loadingBar"></div></div><p id="loadingPercent" class="small">0%</p></div>
   </div>
-
-  <script src="js/config.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/forms.js"></script>
-  <script src="js/names.js"></script>
-  <script src="js/globe-layout.js"></script>
-  <script src="js/globe-render.js"></script>
-  <script src="js/datasheet.js"></script>
-  <script src="js/hints.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/main.js"></script>
+  <script src="../JS/Global-Quiz/config.js"></script>
+  <script src="../JS/Global-Quiz/utils.js"></script>
+  <script src="../JS/Global-Quiz/state.js"></script>
+  <script src="../JS/Global-Quiz/api.js"></script>
+  <script src="../JS/Global-Quiz/forms.js"></script>
+  <script src="../JS/Global-Quiz/names.js"></script>
+  <script src="../JS/Global-Quiz/globe-layout.js"></script>
+  <script src="../JS/Global-Quiz/globe-render.js"></script>
+  <script src="../JS/Global-Quiz/datasheet.js"></script>
+  <script src="../JS/Global-Quiz/hints.js"></script>
+  <script src="../JS/Global-Quiz/ui.js"></script>
+  <script src="../JS/Global-Quiz/game.js"></script>
+  <script src="../JS/Global-Quiz/main.js"></script>
 </body>
-
 </html>
