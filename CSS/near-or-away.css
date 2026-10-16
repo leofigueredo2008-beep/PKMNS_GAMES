@@ -43,3 +43,39 @@
 .na-list li > * { color: var(--text); } .na-list .rk { color: var(--muted) !important; } .na-list .bar b { background: currentColor; }
 .na-list li.z-near .bar b { background: #c8ff2e; } .na-list li.z-mid .bar b { background: #ffc933; } .na-list li.z-away .bar b { background: #ff3b4a; } .na-list li.z-correct .bar b { background: #00ff66; }
 .na-loading { position: fixed; inset: 0; display: grid; place-items: center; text-align: center; background: var(--bg); z-index: 50; }
+
+
+/* Histórico de dicas por Pokémon */
+.na-hint-history {
+  display: inline-block;
+  position: relative;
+  cursor: help;
+}
+
+.na-hint-history .na-hint-tooltip {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 100;
+  width: max-content;
+  max-width: min(320px, 75vw);
+  padding: 10px 12px;
+  border: 1px solid var(--border, #555);
+  border-radius: 10px;
+  background: var(--panel, #20242c);
+  color: var(--text, #fff);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  box-shadow: 0 5px 18px #0004;
+  pointer-events: none;
+}
+
+.na-hint-history:hover .na-hint-tooltip,
+.na-hint-history:focus-within .na-hint-tooltip {
+  display: block;
+}
+
+.na-hint-tooltip p {
+  margin: 4px 0;
+}
