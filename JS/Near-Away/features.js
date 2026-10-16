@@ -30,16 +30,84 @@ async function loadFeatures(onProgress) {
 }
 
 async function buildDex(onProgress) {
-  const list = await getList();               // api.js (same cache as Global Quiz)
-  await getFilterMetadata();                  // api.js: fills pokemonTypes / pokemonGenerations
+  // Use the exact same source and form-building pipeline as Global Quiz.
+  // The 1,025 species are expanded with PokéAPI varieties into the full pool
+  // (currently 1,208 entries, depending on the live PokéAPI form data).
+  let baseList = await getList();
+  await getFilterMetadata();
+  allPokemonList = baseList;
+
+  if (typeof loadEvolutionChains !== "function" ||
+      typeof decorateBaseList !== "function" ||
+      typeof buildFormList !== "function") {
+    throw new Error("Shared alternate-form logic was not loaded.");
+  }
+
+  await loadEvolutionChains();
+  baseList = decorateBaseList(baseList);
+  allPokemonList = baseList.concat(buildFormList(baseList));
+
   const feats = await loadFeatures(onProgress);
-  dex = list.filter(p => feats[p.id] && p.id <= DEX_SIZE).map(p => ({
-    ...p, f: feats[p.id], types: pokemonTypes.get(p.id) || [], initial: p.displayName[0].toLowerCase(),
-    // same regions as the globe: generations 1-9, Hisui (10) split from Gen VIII
-    region: (p.id >= HISUI_SPECIES_FIRST && p.id <= HISUI_SPECIES_LAST) ? 10 : (pokemonGenerations.get(p.id) || 9)
-  }));
+  dex = allPokemonList.map(p => {
+    const speciesId = Number(p.isForm
+      ? (formMeta.get(p.id)?.speciesId || p.speciesId)
+      : p.id);
+    const feature = feats[speciesId] || feats[p.id] || {
+      s: p.name, gn: "", col: "", sh: "", hb: "", eg: [], k: 0,
+      c: `solo-${speciesId || p.id}`
+    };
+    return {
+      ...p,
+      f: feature,
+      types: pokemonTypes.get(p.id) || pokemonTypes.get(speciesId) || [],
+      initial: (p.displayName || p.name || "?").charAt(0).toLowerCase(),
+      region: regionOf(p.id)
+    };
+  });
+
   dexByName.clear();
-  for (const p of dex) for (const n of [p.name, p.displayName, p.f.s]) if (n) dexByName.set(normalizeName(n), p);
+  const addName = (name, pokemon) => {
+    if (!name) return;
+    const key = normalizeName(name);
+    if (key && !dexByName.has(key)) dexByName.set(key, pokemon);
+  };
+
+  // Register regular Pokémon names first so alternate forms can never replace
+  // the base Pokémon when a user types only its ordinary name.
+  for (const p of dex) {
+    if (p.isForm) continue;
+    addName(p.name, p);
+    addName(p.displayName, p);
+    addName(p.f?.s, p);
+    for (const alias of p.aliases || []) addName(alias, p);
+  }
+
+  // Alternate forms require their identifying word:
+  // Mega -> "mega"; Gigantamax -> "gigantamax"; regional -> Alolan/Galarian/
+  // Hisuian/Paldean. Never index raw API names like "raichu-alola" or "charizard-gmax".
+  for (const p of dex) {
+    if (!p.isForm) continue;
+    const kind = formMeta.get(p.id)?.kind || p.kind;
+    const candidates = [p.displayName, ...(p.aliases || [])];
+    if (kind === "mega") {
+      for (const name of candidates) if (/mega/i.test(name)) addName(name, p);
+    } else if (kind === "gmax") {
+      for (const name of candidates) {
+        if (/gigantamax/i.test(name)) addName(name, p);
+        else if (/eternamax/i.test(name)) addName(name, p);
+      }
+    } else if (kind === "regional") {
+      const required = { alola: "alolan", galar: "galarian", hisui: "hisuian", paldea: "paldean" };
+      const regionToken = required[formMeta.get(p.id)?.region || p.region] ||
+        (candidates.join(" ").match(/\b(alolan|galarian|hisuian|paldean)\b/i) || [])[1];
+      for (const name of candidates) {
+        if (regionToken && normalizeName(name).includes(normalizeName(regionToken))) addName(name, p);
+      }
+    } else {
+      // Other form types remain guessable by their full displayed form name.
+      for (const name of candidates) addName(name, p);
+    }
+  }
 }
 
 // Higher = more similar. `why` lists the traits shared with the target.
