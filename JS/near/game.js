@@ -68,9 +68,40 @@ async function startNear() {
   } catch (e) { console.error(e); $n("loadingText").textContent = "Could not load PokéAPI. Check your connection and reload."; }
 }
 
+
+function createHintHistoryHTML(hints) {
+  if (!Array.isArray(hints) || hints.length === 0) {
+    return "";
+  }
+
+  const escapeHTML = (value) =>
+    String(value).replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+
+  return `
+    <span class="na-hint-history" tabindex="0"
+          aria-label="View previous hints">
+      <span aria-hidden="true">ⓘ</span>
+      <span class="na-hint-tooltip" role="tooltip">
+        ${hints.map(hint =>
+          `<p>${escapeHTML(hint)}</p>`
+        ).join("")}
+      </span>
+    </span>
+  `;
+}
+
+
+
 $n("guess").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submitGuess(); } });
 $n("newGame").addEventListener("click", newRound);
 $n("giveUp").addEventListener("click", giveUp);
 const themeSaved = storage.get("pokemon-quiz-theme");
 if (themeSaved === "light") document.body.classList.add("light-theme");
 startNear();
+
