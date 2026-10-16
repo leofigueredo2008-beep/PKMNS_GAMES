@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Near or Away — Pokémon</title>
+  <link rel="stylesheet" href="css/01-variables-themes.css">
+  <link rel="stylesheet" href="css/near-or-away.css">
+</head>
+
+<body>
+  <div class="na-app">
+    <header class="na-head">
+      <a class="na-btn" href="index.html">⌂ CATALOG</a>
+      <h1 class="na-title">🎯 NEAR OR AWAY</h1>
+      <div class="na-actions">
+        <button id="giveUp" class="na-btn" type="button">GIVE UP</button>
+        <button id="newGame" class="na-btn" type="button">NEW GAME</button>
+      </div>
+    </header>
+    <p class="na-sub">A secret Pokémon sits at the center. The closer your guess lands, the more it has in common: evolution line, types, region, color, body shape, category and more.</p>
+    <main class="na-main">
+      <section class="na-board">
+        <div id="target" class="na-target">
+          <div id="center" class="na-center">?</div>
+          <div id="markers"></div>
+        </div>
+        <div class="na-legend">
+          <span><i class="dot correct"></i>Secret</span><span><i class="dot near"></i>Near</span>
+          <span><i class="dot mid"></i>Getting there</span><span><i class="dot away"></i>Away</span>
+        </div>
+      </section>
+      <aside class="na-side">
+        <input id="guess" class="na-input" type="text" autocomplete="off" spellcheck="false" placeholder="Type a Pokémon and press Enter">
+        <div id="msg" class="na-msg" role="status"></div>
+        <div id="why" class="na-why"></div>
+        <ol id="list" class="na-list"></ol>
+      </aside>
+    </main>
+  </div>
+  <div id="loading" class="na-loading">
+    <div><h2>Preparing the target...</h2><p id="loadingText">Loading Pokémon data</p></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/near/features.js"></script>
+  <script src="js/near/game.js"></script>
+</body>
+
+</html>
