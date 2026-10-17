@@ -161,8 +161,8 @@ function nearAwayFormHint(p) {
   const meta = formMeta.get(p.id) || p;
   const kind = meta.kind || p.kind;
   const name = `${p.name || ""} ${p.displayName || ""} ${(p.aliases || []).join(" ")}`;
-  if (kind === "gmax" && /\\b(gigantamax|eternamax)\\b/i.test(name)) return "Gigantamax";
-  if (kind === "mega" && /\\bmega\\b/i.test(name)) return "Mega Evolution";
+  if (kind === "gmax" && /\bgigantamax\b/i.test(name)) return "Gigantamax";
+  if (kind === "mega" && /\bmega\b/i.test(name)) return "Mega Evolution";
   if (kind === "regional") return "Regional Form";
   return "";
 }
