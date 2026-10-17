@@ -98,7 +98,7 @@ function createHintHistoryHTML(hints, isSecretPokemon = false) {
 
   const messages = hints && hints.length
     ? hints
-    : [isSecretPokemon ? "Secret pokemon" : "nothing in common"];
+    : [isSecretPokemon ? "Secret Pokemon" : "nothing in common"];
 
   return `
     <span class="na-hint-history"
