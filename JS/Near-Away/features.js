@@ -109,7 +109,7 @@ async function buildDex(onProgress) {
     const kind = formMeta.get(p.id)?.kind || p.kind;
     const candidates = [p.displayName, ...(p.aliases || [])];
     if (kind === "mega") {
-      for (const name of candidates) if (/mega/i.test(name)) addName(name, p);
+      for (const name of candidates) if (/\b(mega|primal)\b/i.test(name)) addName(name, p);
     } else if (kind === "gmax") {
       for (const name of candidates) {
         if (/gigantamax/i.test(name)) addName(name, p);
@@ -123,9 +123,22 @@ async function buildDex(onProgress) {
         // the other Paldean breeds must explicitly include "aqua" or "blaze".
         const combined = normalizeName(candidates.join(" "));
         if (combined.includes("paldean")) {
-          if (combined.includes("aqua")) addName("paldean tauros aqua", p);
-          else if (combined.includes("blaze")) addName("paldean tauros blaze", p);
-          else if (combined.includes("combat")) addName("paldean tauros", p);
+          if (combined.includes("aqua")) {
+            for (const name of candidates) {
+              if (normalizeName(name).includes("paldean") && normalizeName(name).includes("aqua")) addName(name, p);
+            }
+            addName("paldean tauros aqua", p);
+          } else if (combined.includes("blaze")) {
+            for (const name of candidates) {
+              if (normalizeName(name).includes("paldean") && normalizeName(name).includes("blaze")) addName(name, p);
+            }
+            addName("paldean tauros blaze", p);
+          } else if (combined.includes("combat")) {
+            for (const name of candidates) {
+              if (normalizeName(name).includes("paldean") && normalizeName(name).includes("combat")) addName(name, p);
+            }
+            addName("paldean tauros", p);
+          }
         }
       } else {
         for (const name of candidates) {
