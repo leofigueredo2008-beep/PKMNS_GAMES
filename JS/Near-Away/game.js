@@ -96,14 +96,17 @@ function actualGuessCount() {
 }
 
 function availableHintCandidates() {
-  // Hints unlock only after more than 10 actual guesses and can reveal
-  // only ranked Pokémon #2 through #20, never the secret at #1.
-  if (actualGuessCount() <= 10) return [];
-  const bestRank = guesses.reduce((best, g) => Math.min(best, g.rank), Infinity);
+  // With 10 or fewer actual guesses, reveal Pokémon ranked below the top 20.
+  // After more than 10 actual guesses, reveal ranks #2 through #20.
+  // Rank #1 is always excluded so the secret Pokémon is never shown.
+  const useTopTwenty = actualGuessCount() > 10;
   const alreadyShown = new Set(guesses.map(g => g.p.id));
   return dex.filter(p => {
     const rank = ranks.get(p.id);
-    return rank >= 2 && rank <= 20 && rank < bestRank && !alreadyShown.has(p.id);
+    const inAllowedRange = useTopTwenty
+      ? rank >= 2 && rank <= 20
+      : rank > 20;
+    return inAllowedRange && !alreadyShown.has(p.id);
   });
 }
 
@@ -115,14 +118,15 @@ function updateHintButton() {
 
 function revealHint() {
   if (solved || gaveUpNA) return;
-  if (actualGuessCount() <= 10) {
-    say("Hints unlock after more than 10 guesses.", "bad");
-    updateHintButton();
-    return;
-  }
+  const useTopTwenty = actualGuessCount() > 10;
   const candidates = availableHintCandidates();
   if (!candidates.length) {
-    say("No more Pokémon from the top 20 can be revealed without showing the secret one.", "bad");
+    say(
+      useTopTwenty
+        ? "No more Pokémon from the top 20 can be revealed without showing the secret one."
+        : "No more Pokémon ranked below #20 are available to reveal.",
+      "bad"
+    );
     updateHintButton();
     return;
   }
