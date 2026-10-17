@@ -34,13 +34,18 @@ function isNearAwayAllowedForm(p) {
 
   const meta = formMeta.get(p.id) || p;
   const kind = meta.kind || p.kind;
-  if (["mega", "gmax", "regional"].includes(kind)) return true;
+  const formName = `${p.name || ""} ${p.displayName || ""} ${(p.aliases || []).join(" ")}`;
 
-  // Keep named male/female variants when PokéAPI exposes them as distinct forms.
-  const formName = \`\${p.name || ""} \${p.displayName || ""} \${(p.aliases || []).join(" ")}\`;
+  // Keep actual Mega Evolutions, Gigantamax, and regional forms.
+  // Primal and Eternamax forms are not included by category alone.
+  if (kind === "mega" && /\bmega\b/i.test(formName)) return true;
+  if (kind === "gmax" && /\bgigantamax\b/i.test(formName)) return true;
+  if (kind === "regional") return true;
+
+  // Keep visually distinct male/female forms when exposed as named varieties.
   if (/\b(male|female)\b/i.test(formName)) return true;
 
-  // Other forms qualify only if their type combination differs from the base.
+  // Any other form qualifies only if its type combination differs from base.
   const speciesId = Number(meta.speciesId || p.speciesId);
   const baseTypes = pokemonTypes.get(speciesId) || [];
   const formTypes = pokemonTypes.get(p.id) || baseTypes;
@@ -72,7 +77,7 @@ async function buildDex(onProgress) {
       : p.id);
     const feature = feats[speciesId] || feats[p.id] || {
       s: p.name, gn: "", col: "", sh: "", hb: "", eg: [], k: 0,
-      c: \`solo-\${speciesId || p.id}\`
+      c: `solo-${speciesId || p.id}`
     };
     return {
       ...p,
