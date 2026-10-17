@@ -123,3 +123,20 @@
 .na-hint-tooltip p {
   margin: 4px 0;
 }
+
+
+/* Pokémon revealed by the hint button */
+.na-list li.is-hint { border-style: dashed; }
+.na-hint-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 5px;
+  border: 1px solid var(--yellow);
+  border-radius: 5px;
+  color: var(--yellow) !important;
+  font-size: .62rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+  vertical-align: middle;
+}
+.na-btn:disabled { opacity: .45; cursor: not-allowed; }
