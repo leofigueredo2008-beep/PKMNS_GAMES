@@ -29,10 +29,27 @@ async function loadFeatures(onProgress) {
   return out;
 }
 
+function isNearAwayAllowedForm(p) {
+  if (!p?.isForm) return true;
+
+  const meta = formMeta.get(p.id) || p;
+  const kind = meta.kind || p.kind;
+  if (["mega", "gmax", "regional"].includes(kind)) return true;
+
+  // Keep named male/female variants when PokéAPI exposes them as distinct forms.
+  const formName = \`\${p.name || ""} \${p.displayName || ""} \${(p.aliases || []).join(" ")}\`;
+  if (/\b(male|female)\b/i.test(formName)) return true;
+
+  // Other forms qualify only if their type combination differs from the base.
+  const speciesId = Number(meta.speciesId || p.speciesId);
+  const baseTypes = pokemonTypes.get(speciesId) || [];
+  const formTypes = pokemonTypes.get(p.id) || baseTypes;
+  const normalizeTypes = types => [...types].sort().join("|");
+  return normalizeTypes(formTypes) !== normalizeTypes(baseTypes);
+}
+
 async function buildDex(onProgress) {
-  // Use the exact same source and form-building pipeline as Global Quiz.
-  // The 1,025 species are expanded with PokéAPI varieties into the full pool
-  // (currently 1,208 entries, depending on the live PokéAPI form data).
+  // Preserve every ordinary Pokémon, but limit alternate forms to the requested categories.
   let baseList = await getList();
   await getFilterMetadata();
   allPokemonList = baseList;
@@ -45,7 +62,8 @@ async function buildDex(onProgress) {
 
   await loadEvolutionChains();
   baseList = decorateBaseList(baseList);
-  allPokemonList = baseList.concat(buildFormList(baseList));
+  const allForms = buildFormList(baseList);
+  allPokemonList = baseList.concat(allForms.filter(isNearAwayAllowedForm));
 
   const feats = await loadFeatures(onProgress);
   dex = allPokemonList.map(p => {
@@ -54,7 +72,7 @@ async function buildDex(onProgress) {
       : p.id);
     const feature = feats[speciesId] || feats[p.id] || {
       s: p.name, gn: "", col: "", sh: "", hb: "", eg: [], k: 0,
-      c: `solo-${speciesId || p.id}`
+      c: \`solo-\${speciesId || p.id}\`
     };
     return {
       ...p,
@@ -72,8 +90,7 @@ async function buildDex(onProgress) {
     if (key && !dexByName.has(key)) dexByName.set(key, pokemon);
   };
 
-  // Register regular Pokémon names first so alternate forms can never replace
-  // the base Pokémon when a user types only its ordinary name.
+  // Ordinary names always resolve to the regular/base Pokémon.
   for (const p of dex) {
     if (p.isForm) continue;
     addName(p.name, p);
@@ -82,9 +99,7 @@ async function buildDex(onProgress) {
     for (const alias of p.aliases || []) addName(alias, p);
   }
 
-  // Alternate forms require their identifying word:
-  // Mega -> "mega"; Gigantamax -> "gigantamax"; regional -> Alolan/Galarian/
-  // Hisuian/Paldean. Never index raw API names like "raichu-alola" or "charizard-gmax".
+  // Mega/Gigantamax/regional forms require their identifying word.
   for (const p of dex) {
     if (!p.isForm) continue;
     const kind = formMeta.get(p.id)?.kind || p.kind;
@@ -104,7 +119,6 @@ async function buildDex(onProgress) {
         if (regionToken && normalizeName(name).includes(normalizeName(regionToken))) addName(name, p);
       }
     } else {
-      // Other form types remain guessable by their full displayed form name.
       for (const name of candidates) addName(name, p);
     }
   }
