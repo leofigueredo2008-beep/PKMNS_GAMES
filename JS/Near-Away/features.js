@@ -36,10 +36,9 @@ function isNearAwayAllowedForm(p) {
   const kind = meta.kind || p.kind;
   const formName = `${p.name || ""} ${p.displayName || ""} ${(p.aliases || []).join(" ")}`;
 
-  // Keep actual Mega Evolutions, Gigantamax, and regional forms.
-  // Primal and Eternamax forms are not included by category alone.
-  if (kind === "mega" && /\bmega\b/i.test(formName)) return true;
-  if (kind === "gmax" && /\bgigantamax\b/i.test(formName)) return true;
+  // Keep Mega, Primal, Gigantamax, Eternamax, and regional forms.
+  if (kind === "mega" && /\b(mega|primal)\b/i.test(formName)) return true;
+  if (kind === "gmax" && /\b(gigantamax|eternamax)\b/i.test(formName)) return true;
   if (kind === "regional") return true;
 
   // Keep visually distinct male/female forms when exposed as named varieties.
@@ -117,12 +116,26 @@ async function buildDex(onProgress) {
         else if (/eternamax/i.test(name)) addName(name, p);
       }
     } else if (kind === "regional") {
-      const required = { alola: "alolan", galar: "galarian", hisui: "hisuian", paldea: "paldean" };
-      const regionToken = required[formMeta.get(p.id)?.region || p.region] ||
-        (candidates.join(" ").match(/\b(alolan|galarian|hisuian|paldean)\b/i) || [])[1];
-      for (const name of candidates) {
-        if (regionToken && normalizeName(name).includes(normalizeName(regionToken))) addName(name, p);
+      const speciesId = Number(formMeta.get(p.id)?.speciesId || p.speciesId);
+      const regionToken = (candidates.join(" ").match(/\b(alolan|galarian|hisuian|paldean)\b/i) || [])[1];
+      if (speciesId === 128) {
+        // The Paldean Combat Breed is entered as "paldean tauros";
+        // the other Paldean breeds must explicitly include "aqua" or "blaze".
+        const combined = normalizeName(candidates.join(" "));
+        if (combined.includes("paldean")) {
+          if (combined.includes("aqua")) addName("paldean tauros aqua", p);
+          else if (combined.includes("blaze")) addName("paldean tauros blaze", p);
+          else if (combined.includes("combat")) addName("paldean tauros", p);
+        }
+      } else {
+        for (const name of candidates) {
+          if (regionToken && normalizeName(name).includes(normalizeName(regionToken))) addName(name, p);
+        }
       }
+    } else if (kind === "mega" && candidates.some(name => /\bprimal\b/i.test(name))) {
+      for (const name of candidates) if (/\bprimal\b/i.test(name)) addName(name, p);
+    } else if (kind === "gmax" && candidates.some(name => /\beternamax\b/i.test(name))) {
+      for (const name of candidates) if (/\beternamax\b/i.test(name)) addName(name, p);
     } else {
       for (const name of candidates) addName(name, p);
     }
