@@ -30,14 +30,16 @@ function render() {
   const last = guesses[guesses.length - 1];
   $n("why").textContent = last && !solved ? `${last.p.displayName}: ${last.why.length ? last.why.join(" • ") : "nothing in common"}` : "";
   const sorted = guesses.slice().sort((a, b) => a.rank - b.rank);
+  updateHintButton();
   
   hideFloatingHint();
 
   $n("list").innerHTML = sorted.map(g => `
-    <li class="z-${zoneOf(g.rank)}${g === last ? " latest" : ""}">
+    <li class="z-${zoneOf(g.rank)}${g === last ? " latest" : ""}${g.isHint ? " is-hint" : ""}">
       ${sprite(g.p)}
       <span class="nm">
         ${escapeHTML(g.p.displayName)}
+        ${g.isHint ? '<span class="na-hint-tag">HINT</span>' : ""}
         ${createHintHistoryHTML(g.why, g.rank === 1)}
       </span>
       <span class="rk">#${g.rank}</span>
@@ -65,11 +67,50 @@ function submitGuess() {
   const raw = $n("guess").value.trim(); if (!raw) return;
   const key = normalizeName(raw), p = dexByName.get(key);
   if (!p) { const c = closestName(key); say(c ? `Not found. Did you mean ${c.displayName}?` : "That isn't a Pokémon.", "bad"); return; }
-  if (guesses.some(g => g.p.id === p.id)) { say(`${p.displayName} was already guessed.`, "bad"); $n("guess").select(); return; }
+  const existing = guesses.find(g => g.p.id === p.id);
+  if (existing && !existing.isHint) { say(`${p.displayName} was already guessed.`, "bad"); $n("guess").select(); return; }
   const rank = ranks.get(p.id), why = p.id === target.id ? [] : similarity(p, target).why;
-  guesses.push({ p, rank, why }); $n("guess").value = "";
-  if (rank === 1) { solved = true; $n("guess").disabled = true; say(`🎉 It's ${p.displayName}! Found in ${guesses.length} guess${guesses.length > 1 ? "es" : ""}.`, "good"); }
+  if (existing?.isHint) {
+    existing.isHint = false;
+    existing.why = why;
+  } else {
+    guesses.push({ p, rank, why, isHint: false });
+  }
+  $n("guess").value = "";
+  if (rank === 1) { solved = true; $n("guess").disabled = true; const actualGuessCount = guesses.filter(g => !g.isHint).length; say(`🎉 It's ${p.displayName}! Found in ${actualGuessCount} guess${actualGuessCount > 1 ? "es" : ""}.`, "good"); }
   else say(`${p.displayName} — #${rank} of ${dex.length}`, zoneOf(rank) === "away" ? "bad" : "good");
+  render();
+}
+
+function availableHintCandidates() {
+  const bestRank = guesses.reduce((best, g) => Math.min(best, g.rank), Infinity);
+  const alreadyShown = new Set(guesses.map(g => g.p.id));
+  return dex.filter(p => {
+    const rank = ranks.get(p.id);
+    return rank > 1 && rank < bestRank && !alreadyShown.has(p.id);
+  });
+}
+
+function updateHintButton() {
+  const button = $n("getHint");
+  if (!button) return;
+  button.disabled = solved || gaveUpNA || availableHintCandidates().length === 0;
+}
+
+function revealHint() {
+  if (solved || gaveUpNA) return;
+  const candidates = availableHintCandidates();
+  if (!candidates.length) {
+    say("No better Pokémon can be revealed without showing the secret one.", "bad");
+    updateHintButton();
+    return;
+  }
+
+  const p = candidates[Math.floor(Math.random() * candidates.length)];
+  const rank = ranks.get(p.id);
+  const why = similarity(p, target).why;
+  guesses.push({ p, rank, why, isHint: true });
+  say(`Hint revealed: ${p.displayName} — #${rank} of ${dex.length}`, "good");
   render();
 }
 
@@ -241,6 +282,7 @@ window.addEventListener("resize", () => {
 $n("guess").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submitGuess(); } });
 $n("newGame").addEventListener("click", newRound);
 $n("giveUp").addEventListener("click", giveUp);
+$n("getHint").addEventListener("click", revealHint);
 const themeSaved = storage.get("pokemon-quiz-theme");
 if (themeSaved === "light") document.body.classList.add("light-theme");
 startNear();
