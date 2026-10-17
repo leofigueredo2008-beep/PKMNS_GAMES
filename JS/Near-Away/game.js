@@ -1,5 +1,5 @@
 /* Near or Away: round flow and rendering. */
-let target = null, ranks = new Map(), guesses = [], solved = false, gaveUpNA = false;
+let target = null, ranks = new Map(), guesses = [], solved = false, gaveUpNA = false, usedHint = false;
 const $n = id => document.getElementById(id);
 
 // distance from center (0..1) on a log scale, so the first ranks get most of the room
@@ -8,7 +8,7 @@ const AREA = 46;   // marker radius at distance 1, in % of the board width
 
 function newRound() {
   target = dex[Math.floor(Math.random() * dex.length)];
-  ranks = rankAgainst(target); guesses = []; solved = false; gaveUpNA = false;
+  ranks = rankAgainst(target); guesses = []; solved = false; gaveUpNA = false; usedHint = false;
   const t = $n("target");
   t.style.setProperty("--rn", (radiusOf(NEAR_RANK) * AREA * 2) + "%");
   t.style.setProperty("--rf", (radiusOf(FAR_RANK) * AREA * 2) + "%");
@@ -77,17 +77,33 @@ function submitGuess() {
     guesses.push({ p, rank, why, isHint: false });
   }
   $n("guess").value = "";
-  if (rank === 1) { solved = true; $n("guess").disabled = true; const actualGuessCount = guesses.filter(g => !g.isHint).length; say(`🎉 It's ${p.displayName}! Found in ${actualGuessCount} guess${actualGuessCount > 1 ? "es" : ""}.`, "good"); }
+  if (rank === 1) {
+    solved = true;
+    $n("guess").disabled = true;
+    if (usedHint) {
+      say("I guess it was too hard for you", "good");
+    } else {
+      const actualGuessCount = guesses.filter(g => !g.isHint).length;
+      say(`🎉 It's ${p.displayName}! Found in ${actualGuessCount} guess${actualGuessCount > 1 ? "es" : ""}.`, "good");
+    }
+  }
   else say(`${p.displayName} — #${rank} of ${dex.length}`, zoneOf(rank) === "away" ? "bad" : "good");
   render();
 }
 
+function actualGuessCount() {
+  return guesses.filter(g => !g.isHint).length;
+}
+
 function availableHintCandidates() {
+  // Hints unlock only after more than 10 actual guesses and can reveal
+  // only ranked Pokémon #2 through #20, never the secret at #1.
+  if (actualGuessCount() <= 10) return [];
   const bestRank = guesses.reduce((best, g) => Math.min(best, g.rank), Infinity);
   const alreadyShown = new Set(guesses.map(g => g.p.id));
   return dex.filter(p => {
     const rank = ranks.get(p.id);
-    return rank > 1 && rank < bestRank && !alreadyShown.has(p.id);
+    return rank >= 2 && rank <= 20 && rank < bestRank && !alreadyShown.has(p.id);
   });
 }
 
@@ -99,9 +115,14 @@ function updateHintButton() {
 
 function revealHint() {
   if (solved || gaveUpNA) return;
+  if (actualGuessCount() <= 10) {
+    say("Hints unlock after more than 10 guesses.", "bad");
+    updateHintButton();
+    return;
+  }
   const candidates = availableHintCandidates();
   if (!candidates.length) {
-    say("No better Pokémon can be revealed without showing the secret one.", "bad");
+    say("No more Pokémon from the top 20 can be revealed without showing the secret one.", "bad");
     updateHintButton();
     return;
   }
@@ -109,6 +130,7 @@ function revealHint() {
   const p = candidates[Math.floor(Math.random() * candidates.length)];
   const rank = ranks.get(p.id);
   const why = similarity(p, target).why;
+  usedHint = true;
   guesses.push({ p, rank, why, isHint: true });
   say(`Hint revealed: ${p.displayName} — #${rank} of ${dex.length}`, "good");
   render();
