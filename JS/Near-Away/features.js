@@ -155,6 +155,18 @@ async function buildDex(onProgress) {
   }
 }
 
+// Categorize the requested alternate forms for similarity hints.
+function nearAwayFormHint(p) {
+  if (!p?.isForm) return "";
+  const meta = formMeta.get(p.id) || p;
+  const kind = meta.kind || p.kind;
+  const name = `${p.name || ""} ${p.displayName || ""} ${(p.aliases || []).join(" ")}`;
+  if (kind === "gmax" && /\\b(gigantamax|eternamax)\\b/i.test(name)) return "Gigantamax";
+  if (kind === "mega" && /\\bmega\\b/i.test(name)) return "Mega Evolution";
+  if (kind === "regional") return "Regional Form";
+  return "";
+}
+
 // Higher = more similar. `why` lists the traits shared with the target.
 function similarity(a, t) {
   const why = []; let s = 0;
@@ -170,7 +182,20 @@ function similarity(a, t) {
   const eg = a.f.eg.filter(x => t.f.eg.includes(x));
   if (eg.length) { s += 5 * eg.length; why.push("egg group " + eg.join("/")); }
   if (a.f.hb && a.f.hb === t.f.hb) { s += 4; why.push("habitat " + a.f.hb); }
-  if (a.initial === t.initial) { s += 3; why.push("same initial"); }
+  // Form-category hints appear only when the secret Pokémon and the guess
+  // are both alternate forms in the same requested category.
+  const guessedFormHint = nearAwayFormHint(a);
+  const targetFormHint = nearAwayFormHint(t);
+  if (guessedFormHint && guessedFormHint === targetFormHint) {
+    s += 9;
+    why.push(guessedFormHint);
+  }
+
+  // Alternate forms never receive the "same initial" hint.
+  if (!a.isForm && !t.isForm && a.initial === t.initial) {
+    s += 3;
+    why.push("same initial");
+  }
   return { score: s + 1 / (1 + Math.abs(a.id - t.id)), why };   // dex distance only breaks ties
 }
 
