@@ -38,7 +38,7 @@ function render() {
       ${sprite(g.p)}
       <span class="nm">
         ${escapeHTML(g.p.displayName)}
-        ${createHintHistoryHTML(g.why)}
+        ${createHintHistoryHTML(g.why, g.rank === 1)}
       </span>
       <span class="rk">#${g.rank}</span>
        <span class="bar">
@@ -86,7 +86,7 @@ async function startNear() {
 
 
 
-function createHintHistoryHTML(hints) {
+function createHintHistoryHTML(hints, isSecretPokemon = false) {
   const escapeAttr = value =>
     String(value).replace(/[&<>"']/g, char => ({
       "&": "&amp;",
@@ -98,7 +98,7 @@ function createHintHistoryHTML(hints) {
 
   const messages = hints && hints.length
     ? hints
-    : ["nothing in common"];
+    : [isSecretPokemon ? "Secret pokemon" : "nothing in common"];
 
   return `
     <span class="na-hint-history"
