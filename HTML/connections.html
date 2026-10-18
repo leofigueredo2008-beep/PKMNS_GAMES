@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Connections — Pokémon</title>
+  <link rel="stylesheet" href="../CSS/Global-Quiz/01-variables-themes.css">
+  <link rel="stylesheet" href="../CSS/Connections/connections.css">
+</head>
+<body>
+  <div class="cn-app">
+    <header class="cn-header">
+      <a class="cn-btn" href="../index.html">⌂ CATALOG</a>
+      <div class="cn-brand"><h1>CONNECTIONS</h1><p>One Pokémon leads to another. Find what connects them.</p></div>
+      <button id="newGame" class="cn-btn" type="button">NEW GAME</button>
+    </header>
+
+    <section class="cn-status">
+      <div><span class="cn-stat-label">CONNECTIONS</span><strong id="score">0</strong></div>
+      <div><span class="cn-stat-label">STREAK</span><strong id="streak">0</strong></div>
+      <div class="cn-clue"><span class="cn-stat-label">FIND A POKÉMON WITH</span><strong id="clue">Preparing your first connection…</strong></div>
+    </section>
+
+    <main class="cn-game">
+      <section class="cn-chain-panel">
+        <div class="cn-section-heading"><span>YOUR CHAIN</span><span id="chainCount">1 Pokémon</span></div>
+        <div id="chain" class="cn-chain"></div>
+      </section>
+      <section class="cn-options-panel">
+        <div class="cn-section-heading"><span>CHOOSE THE NEXT LINK</span><span>3 OPTIONS</span></div>
+        <div id="options" class="cn-options"></div>
+        <p id="message" class="cn-message" role="status" aria-live="polite">Loading Pokémon…</p>
+      </section>
+    </main>
+    <footer class="cn-footer">Each round gives you a connection clue. Pick one of the three Pokémon that matches it.</footer>
+  </div>
+
+  <div id="loading" class="cn-loading"><div><div class="cn-loader"></div><h2>Preparing Connections…</h2><p id="loadingText">Loading the Pokémon from Near or Away</p></div></div>
+  <script src="../JS/Global-Quiz/config.js"></script>
+  <script src="../JS/Global-Quiz/utils.js"></script>
+  <script src="../JS/Global-Quiz/state.js"></script>
+  <script src="../JS/Global-Quiz/api.js"></script>
+  <script src="../JS/Global-Quiz/forms.js"></script>
+  <script src="../JS/Near-Away/features.js"></script>
+  <script src="../JS/Connections/game.js"></script>
+</body>
+</html>
