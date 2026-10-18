@@ -12,7 +12,7 @@ const cnTraits = [
   { id: "color", tier: 0, value: p => p.f?.col || "", match: (p, v) => !!v && p.f?.col === v, label: v => v + " color" },
   { id: "shape", tier: 0, value: p => p.f?.sh || "", match: (p, v) => !!v && p.f?.sh === v, label: () => "similar body shape" },
   { id: "habitat", tier: 1, value: p => p.f?.hb || "", match: (p, v) => !!v && p.f?.hb === v, label: v => v.replace(/-/g, " ") + " habitat" },
-  { id: "region", tier: 1, value: p => p.region, match: (p, v) => p.region === v, label: v => (GEN_REGION_NAMES[v] || "same") + " region" },
+  { id: "region", tier: 1, value: p => p.region ?? null, match: (p, v) => v != null && p.region != null && p.region === v, label: v => (GEN_REGION_NAMES[v] || "same") + " region" },
   { id: "egg", tier: 1, value: p => p.f?.eg || [], match: (p, v) => (p.f?.eg || []).includes(v), label: v => v.replace(/-/g, " ") + " egg group" },
   { id: "genus", tier: 1, value: p => p.f?.gn || "", match: (p, v) => !!v && p.f?.gn === v, label: v => v + " Pokémon category" },
   { id: "move", tier: 2, value: p => cnDetails(p).then(d => d.moves), async: true, label: v => "can learn " + v.replace(/-/g, " ") },
@@ -51,8 +51,9 @@ function cnValues(trait, p, details) {
   return Array.isArray(value) ? value : [value];
 }
 function cnTraitMatches(trait, a, b, da, db) {
-  const av = cnValues(trait, a, da), bv = cnValues(trait, b, db);
-  return av.some(v => v !== "" && v !== null && v !== undefined && bv.includes(v));
+  const av = cnValues(trait, a, da).filter(v => v !== "" && v !== null && v !== undefined && !(typeof v === "number" && !Number.isFinite(v)));
+  const bv = cnValues(trait, b, db).filter(v => v !== "" && v !== null && v !== undefined && !(typeof v === "number" && !Number.isFinite(v)));
+  return av.some(v => bv.includes(v));
 }
 async function cnDataFor(p, tier) { return tier === 2 ? cnDetails(p) : null; }
 async function cnFindConnection(a, b, tier, da, db) {
@@ -69,7 +70,9 @@ async function cnFindConnection(a, b, tier, da, db) {
 async function cnConnectionOptions(current, tier, historyIds) {
   const candidates = cnShuffle(dex.filter(p => p.id !== current.id && !historyIds.has(p.id)));
   // Hard-mode traits need battle data. Sample a broad pool to avoid requesting all 1,000+ entries.
-  const pool = tier === 2 ? candidates.slice(0, 90) : candidates;
+  // Use a larger hard-mode pool: after excluding Pokémon already in the chain,
+  // a small random sample may not contain two valid distractors.
+  const pool = tier === 2 ? candidates.slice(0, 240) : candidates;
   const currentDetails = tier === 2 ? await cnDetails(current) : null;
   const candidateRows = [];
   for (let i = 0; i < pool.length; i += tier === 2 ? 12 : 10000) {
