@@ -17,7 +17,7 @@ const cnTraits = [
   { id: "genus", tier: 1, value: p => p.f?.gn || "", match: (p, v) => !!v && p.f?.gn === v, label: v => v + " Pokémon category" },
   { id: "move", tier: 2, value: p => cnDetails(p).then(d => d.moves), async: true, label: v => "can learn " + v.replace(/-/g, " ") },
   { id: "ability", tier: 2, value: p => cnDetails(p).then(d => d.abilities), async: true, label: v => "shares the " + v.replace(/-/g, " ") + " ability" },
-  ...["hp", "attack", "defense", "special-attack", "special-defense", "speed"].map(stat => ({
+  ...["attack", "defense", "special-attack", "special-defense", "speed"].map(stat => ({
     id: "stat:" + stat, tier: 2, async: true, stat,
     label: v => "same " + stat.replace("special-", "special ").replace(/-/g, " ") + " stat value (" + v + ")"
   }))
@@ -56,7 +56,7 @@ function cnTraitMatches(trait, a, b, da, db) {
 }
 async function cnDataFor(p, tier) { return tier === 2 ? cnDetails(p) : null; }
 async function cnFindConnection(a, b, tier, da, db) {
-  for (const trait of cnTraits.filter(t => t.tier <= tier)) {
+  for (const trait of cnTraits.filter(t => t.tier <= tier).sort((a, b) => b.tier - a.tier)) {
     if (trait.tier === 2 && tier < 2) continue;
     if (cnTraitMatches(trait, a, b, da, db)) {
       const av = cnValues(trait, a, da), bv = cnValues(trait, b, db);
@@ -162,7 +162,7 @@ async function cnChoose(id, button) {
   cnCurrent = chosen;
   cnScore++;
   cnStreak++;
-  cnSetMessage("Connected! " + cnTrait.trait.label(cnTrait.value) + ".", "good");
+  cnSetMessage(chosen.displayName + " connects to " + cnChain[cnChain.length - 2].displayName + " through: " + cnTrait.trait.label(cnTrait.value) + ".", "good");
   cnRenderChain();
   $c("score").textContent = cnScore;
   $c("streak").textContent = cnStreak;
