@@ -9,14 +9,14 @@ let cnStreak = 0;
 let cnLocked = false;
 
 const cnTraits = [
-  { id: "type", title: p => "the " + cnPick(p.types) + " type", values: p => p.types || [], match: (p, value) => (p.types || []).includes(value), display: value => typeName(value) + " type" },
+  { id: "type", title: (p, value) => "the " + typeName(value) + " type", values: p => p.types || [], match: (p, value) => (p.types || []).includes(value), display: value => typeName(value) + " type" },
   { id: "evolution", title: () => "the same evolution line", value: p => p.f?.c || "", match: (p, value) => !!value && value === (p.f?.c || ""), display: () => "evolution line" },
-  { id: "region", title: p => "the " + (GEN_REGION_NAMES[p.region] || "same") + " region", value: p => p.region, match: (p, value) => p.region === value, display: value => (GEN_REGION_NAMES[value] || "same") + " region" },
-  { id: "color", title: p => "the " + p.f.col + " color", value: p => p.f?.col || "", match: (p, value) => !!value && p.f?.col === value, display: value => value + " color" },
+  { id: "region", title: (p, value) => "the " + (GEN_REGION_NAMES[value] || "same") + " region", value: p => p.region, match: (p, value) => p.region === value, display: value => (GEN_REGION_NAMES[value] || "same") + " region" },
+  { id: "color", title: (p, value) => "the " + value + " color", value: p => p.f?.col || "", match: (p, value) => !!value && p.f?.col === value, display: value => value + " color" },
   { id: "shape", title: p => "a similar body shape", value: p => p.f?.sh || "", match: (p, value) => !!value && p.f?.sh === value, display: () => "body shape" },
-  { id: "egg", title: p => "an egg group in common", values: p => p.f?.eg || [], match: (p, value) => (p.f?.eg || []).includes(value), display: value => value.replace(/-/g, " ") + " egg group" },
-  { id: "habitat", title: p => "the " + p.f.hb + " habitat", value: p => p.f?.hb || "", match: (p, value) => !!value && p.f?.hb === value, display: value => value.replace(/-/g, " ") + " habitat" },
-  { id: "genus", title: p => "the same Pokémon category", value: p => p.f?.gn || "", match: (p, value) => !!value && p.f?.gn === value, display: value => value + " Pokémon category" }
+  { id: "egg", title: (p, value) => "the " + value.replace(/-/g, " ") + " egg group", values: p => p.f?.eg || [], match: (p, value) => (p.f?.eg || []).includes(value), display: value => value.replace(/-/g, " ") + " egg group" },
+  { id: "habitat", title: (p, value) => "the " + value.replace(/-/g, " ") + " habitat", value: p => p.f?.hb || "", match: (p, value) => !!value && p.f?.hb === value, display: value => value.replace(/-/g, " ") + " habitat" },
+  { id: "genus", title: (p, value) => "the " + value + " Pokémon category", value: p => p.f?.gn || "", match: (p, value) => !!value && p.f?.gn === value, display: value => value + " Pokémon category" }
 ];
 
 function cnPick(list) { return list[Math.floor(Math.random() * list.length)]; }
@@ -61,7 +61,7 @@ function cnBuildRound() {
   }
   cnTrait = selected;
   cnOptions = cnShuffle([selected.correct, ...selected.wrong]);
-  $c("clue").textContent = selected.trait.title(cnCurrent).replace(selected.value, selected.trait.display(selected.value));
+  $c("clue").textContent = selected.trait.title(cnCurrent, selected.value);
   $c("options").innerHTML = cnOptions.map(p => `
     <button class="cn-option" type="button" data-id="${p.id}" aria-label="Choose ${cnEsc(p.displayName)}">
       ${cnSprite(p)}<span>${cnEsc(p.displayName)}</span>
